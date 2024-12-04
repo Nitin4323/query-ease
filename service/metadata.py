@@ -1,6 +1,8 @@
+import re
+
 from logger import Logger
-from utility import Database
-from dotenv import load_dotenv
+from utility import Database, File
+
 
 class Metadata:
     __logger = Logger.get_logger()
@@ -131,3 +133,18 @@ class Metadata:
             for schema_name in schema_names:
                 cls.__write_schema_details_to_file(schema_name, file)
         cls.__logger.info(f'database metadata written to {filename}')
+
+    @classmethod
+    def get_chunks_of_metadata(cls, filename):
+        """
+        Method to create the chunks from metadata file
+        """
+        content = File.read_file(filename)
+        table_name_pattern = r'\bTable\b'
+        split_data = re.split(table_name_pattern, content)
+        chunks = []
+        for i, chunk in enumerate(split_data):
+            if i > 0:
+                chunk = f'Table{chunk}'
+            chunks.append(chunk)
+        return chunks
